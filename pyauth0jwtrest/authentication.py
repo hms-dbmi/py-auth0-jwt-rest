@@ -4,9 +4,10 @@ from django.contrib.auth.backends import RemoteUserBackend, get_user_model
 from django.utils.translation import ugettext as _
 from rest_framework import exceptions
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+import jwt
 
 from pyauth0jwtrest.settings import jwt_api_settings, auth0_api_settings
-from pyauth0jwtrest.utils import get_auth0_public_key
+from pyauth0jwtrest.utils import get_auth0_public_key, get_jwt_value
 
 jwt_decode_handler = jwt_api_settings.JWT_DECODE_HANDLER
 jwt_get_username_from_payload = jwt_api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
@@ -30,8 +31,24 @@ class Auth0JSONWebTokenAuthentication(JSONWebTokenAuthentication, RemoteUserBack
         This function initialize the settings of JWT with the specific client's informations.
         """
 
+        # Determine which Auth0 Client ID (aud) the JWT pertains to.
+        try:
+            jwt_string = get_jwt_value(request)
+            auth0_client_id = str(jwt.decode(jwt_string, verify=False)['aud'])
+        except Exception as e:
+            msg = _('Failed to get the aud from jwt payload')
+            raise exceptions.AuthenticationFailed(msg)
+
+        # Check that the Client ID is in the allowed list of Auth0 Client IDs for this application
+        allowed_auth0_client_id_list = auth0_api_settings.CLIENT_ID_LIST
+        if auth0_client_id not in allowed_auth0_client_id_list:
+            msg = _('Auth0 Client ID not allowed')
+            raise exceptions.AuthenticationFailed(msg)
+
+        # Set the JWT_AUDIENCE for this request to the accepted Auth0 Client ID
+        jwt_api_settings.JWT_AUDIENCE = auth0_client_id
+
         jwt_api_settings.JWT_ALGORITHM = auth0_api_settings.ALGORITHM
-        jwt_api_settings.JWT_AUDIENCE = auth0_api_settings.CLIENT_ID
         jwt_api_settings.JWT_AUTH_HEADER_PREFIX = auth0_api_settings.JWT_AUTH_HEADER_PREFIX
 
         # RS256 Related configurations
