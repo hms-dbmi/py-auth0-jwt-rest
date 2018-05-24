@@ -7,6 +7,7 @@ USER_SETTINGS = getattr(settings, 'AUTH0', None)
 DEFAULTS = {
     'ALGORITHM': 'RS256',
     'CLIENT_ID': getattr(settings, 'AUTH0_CLIENT_ID', None),
+    'CLIENT_ID_LIST': getattr(settings, 'AUTH0_CLIENT_ID_LIST', None),
     'DOMAIN': getattr(settings, 'AUTH0_DOMAIN', None),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'USERNAME_FIELD': 'email',
