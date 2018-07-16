@@ -10,8 +10,7 @@ DEFAULTS = {
     'DOMAIN': getattr(settings, 'AUTH0_DOMAIN', None),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'USERNAME_FIELD': 'email',
-    'JWT_PAYLOAD_GET_USERNAME_HANDLER':
-    'pyauth0jwtrest.utils.auth0_get_username_from_payload_handler',
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': 'pyauth0jwtrest.utils.auth0_get_username_from_payload_handler',
     'CREATE_USERS': True,
     'CLIENT_SECRET_BASE64_ENCODED': True,
     'CLIENT_SECRET': getattr(settings, 'AUTH0_CLIENT_SECRET', None),
@@ -24,3 +23,7 @@ IMPORT_STRINGS = (
 
 auth0_api_settings = APISettings(USER_SETTINGS, DEFAULTS, IMPORT_STRINGS)
 jwt_api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER = auth0_api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
+
+# Sometimes the iat timestamp from Auth0 is ahead of our localhost or our AWS servers.
+# Use the leeway setting to prevent "iat > now + leeway" errors.
+jwt_api_settings.JWT_LEEWAY = 10
