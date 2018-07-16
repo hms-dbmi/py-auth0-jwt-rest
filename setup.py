@@ -1,8 +1,9 @@
 from distutils.core import setup
+from setuptools import find_packages
 
 setup(
     name='py-auth0-jwt-rest',
-    version='0.1.1',
+    version='0.1.2',
     url='https://github.com/hms-dbmi/py-auth0-jwt-rest',
     author='HMS DBMI Tech-core',
     author_email='dbmi-tech-core@hms.harvard.edu',
