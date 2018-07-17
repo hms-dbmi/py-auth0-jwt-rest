@@ -27,4 +27,4 @@ jwt_api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER = auth0_api_settings.JWT_PAYLO
 
 # Sometimes the iat timestamp from Auth0 is ahead of our localhost or our AWS servers.
 # Use the leeway setting to prevent "iat > now + leeway" errors.
-jwt_api_settings.JWT_LEEWAY = 10
+jwt_api_settings.JWT_LEEWAY = 60
