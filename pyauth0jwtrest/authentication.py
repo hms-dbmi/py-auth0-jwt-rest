@@ -68,7 +68,9 @@ class Auth0JSONWebTokenAuthentication(JSONWebTokenAuthentication, RemoteUserBack
 
     def authenticate_credentials(self, payload):
         """
-        Returns an active user that matches the payload's user id and email.
+        Once Django Rest Framework calls this method, it can be assumed that the JWT has been
+        verified. If the application requires users to exist, create a user if one is not found.
+        Returns a Django user or username.
         """
 
         UserModel = get_user_model()
@@ -78,9 +80,8 @@ class Auth0JSONWebTokenAuthentication(JSONWebTokenAuthentication, RemoteUserBack
             msg = _('Invalid payload.')
             raise exceptions.AuthenticationFailed(msg)
 
-        # Attempt to create/find user
         user = None
-        if auth0_api_settings.CREATE_USERS:
+        if auth0_api_settings.REQUIRE_USERS:
 
             # Check for email property, and if so assign it to both username and email
             if auth0_api_settings.USERNAME_FIELD == 'email':
@@ -89,14 +90,7 @@ class Auth0JSONWebTokenAuthentication(JSONWebTokenAuthentication, RemoteUserBack
                 user, created = UserModel._default_manager.get_or_create(**{
                     UserModel.USERNAME_FIELD: username
                 })
+
+            return user if self.user_can_authenticate(user) else None
         else:
-            try:
-                user = UserModel._default_manager.get_by_natural_key(username)
-            except UserModel.DoesNotExist:
-                msg = _('Invalid signature.')
-                raise exceptions.AuthenticationFailed(msg)
-                # RemoteUserBackend behavior:
-                # pass
-
-        return user if self.user_can_authenticate(user) else None
-
+            return username

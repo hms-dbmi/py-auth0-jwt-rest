@@ -1,4 +1,6 @@
 import requests
+import jwt
+
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.hazmat.backends import default_backend
 
@@ -14,7 +16,6 @@ from pyauth0jwtrest.settings import auth0_api_settings
 def auth0_get_username_from_payload_handler(payload):
     username = payload.get(auth0_api_settings.USERNAME_FIELD)
     return username
-
 
 # Authorization Utils ---------------------------------------------------------
 def get_jwt_value(request):
@@ -34,6 +35,9 @@ def get_jwt_value(request):
 
     return auth[1]
 
+def get_email_from_request(request):
+    jwt_value = get_jwt_value(request)
+    return str(jwt.decode(jwt_value, verify=False)['email'])
 
 def get_auth0_public_key(auth0_domain):
 
