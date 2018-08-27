@@ -12,7 +12,7 @@ DEFAULTS = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'USERNAME_FIELD': 'email',
     'JWT_PAYLOAD_GET_USERNAME_HANDLER': 'pyauth0jwtrest.utils.auth0_get_username_from_payload_handler',
-    'CREATE_USERS': True,
+    'REQUIRE_USERS': True,
     'CLIENT_SECRET_BASE64_ENCODED': True,
     'CLIENT_SECRET': getattr(settings, 'AUTH0_CLIENT_SECRET', None),
 }
